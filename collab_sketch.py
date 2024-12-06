@@ -569,9 +569,17 @@ class SketchApp:
         
 
     def run(self, hostname, ip_address):
-        # Run the app
-        self.app.run(debug=True, host='0.0.0.0', use_reloader=False)
+        # Create a socket to find an available port
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        sock.bind(('0.0.0.0', 0))  # Port 0 tells the OS to find an available port
+        port = sock.getsockname()[1]  # Get the port number that was assigned
+        sock.close()
         
+        print(f'Server running at: http://{ip_address}:{port}')
+        
+        # Run the app with the found port
+        self.app.run(debug=True, host='0.0.0.0', port=port, use_reloader=False)
 
 # Initialize and run the SketchApp
 if __name__ == '__main__':
