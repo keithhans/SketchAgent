@@ -18,7 +18,7 @@ def call_argparse():
     # General
     parser.add_argument('--concept_to_draw', type=str, default="cat")
     parser.add_argument('--seed_mode', type=str, default='deterministic', choices=['deterministic', 'stochastic'])
-    parser.add_argument('--path2save', type=str, default=f"results/test/")
+    parser.add_argument('--path2save', type=str, default=f"results/test")
     parser.add_argument('--model', type=str, default='claude-3-5-sonnet-20240620')
     parser.add_argument('--gen_mode', type=str, default='generation', choices=['generation', 'completion'])
 
