@@ -39,6 +39,10 @@ conda activate sketch_agent
 conda env create -f mac_environment.yml
 conda activate sketch_agent
 ```
+If python flashes a warning at you, try reinstalling `cairosvg`:
+```
+conda uninstall cairosvg && conda install cairosvg
+```
 
 #### API Key
 This repository requires an Anthropic API key. If you don't have one, [create an Anthropic account](https://console.anthropic.com/login) and follow the instructions to obtain a key.
