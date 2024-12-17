@@ -23,7 +23,7 @@ def call_argparse():
     parser.add_argument('--concept_to_draw', type=str, default="cat")
     parser.add_argument('--seed_mode', type=str, default='deterministic', choices=['deterministic', 'stochastic'])
     parser.add_argument('--path2save', type=str, default=f"results/test")
-    parser.add_argument('--model', type=str, default='claude-3-5-sonnet-20240620')
+    parser.add_argument('--model', type=str, default='claude-3-5-sonnet-20241022')
     parser.add_argument('--gen_mode', type=str, default='generation', choices=['generation', 'completion'])
 
     # Grid params
@@ -142,18 +142,22 @@ class SketchApp:
             
         # In case of stroke by stroke generation
         if stop_sequences:
-            additional_args["stop_sequences"]= [stop_sequences]
+            additional_args["stop_sequences"] = [stop_sequences]
         else:
-            additional_args["stop_sequences"]= ["</answer>"]
- 
+            additional_args["stop_sequences"] = ["</answer>"]
+
+        # Create the body dictionary properly by combining all parameters
         body = {
             "model": self.model,
             "messages": [
                 {
                     "role": "system",
                     "content": system_message
-                } ] + other_msg,
-        } + additional_args
+                }
+            ] + other_msg,
+            **additional_args  # Unpack additional arguments into the body dictionary
+        }
+        
         payload = json.dumps(body)
         Baseurl = "https://api.claude-Plus.top"
         url = Baseurl + "/v1/chat/completions"
