@@ -7,9 +7,13 @@ import os
 import utils
 import traceback
 
+import requests
+import json
+
 from dotenv import load_dotenv
 from PIL import Image
 from prompts import sketch_first_prompt, system_prompt, gt_example
+
 
 
 def call_argparse():
@@ -61,8 +65,8 @@ class SketchApp:
         self.cache = False
         self.max_tokens = 3000
         load_dotenv()
-        claude_key = os.getenv("ANTHROPIC_API_KEY")
-        self.client = anthropic.Anthropic(api_key=claude_key)
+        self.claude_key = os.getenv("ANTHROPIC_API_KEY")
+        self.client = anthropic.Anthropic(api_key=self.claude_key)
         self.model = args.model
         self.input_prompt = sketch_first_prompt.format(concept=args.concept_to_draw, gt_sketches_str=gt_example)
         self.gen_mode = args.gen_mode
@@ -142,8 +146,29 @@ class SketchApp:
         else:
             additional_args["stop_sequences"]= ["</answer>"]
  
-        response = self.call_llm(system_message, other_msg, additional_args)
-        content = response.content[0].text
+        body = {
+            "model": self.model,
+            "messages": [
+                {
+                    "role": "system",
+                    "content": system_message
+                } ] + other_msg,
+        } + additional_args
+        payload = json.dumps(body)
+        Baseurl = "https://api.claude-Plus.top"
+        url = Baseurl + "/v1/chat/completions"
+        headers = {
+            'Accept': 'application/json',
+            'Authorization': f'Bearer {self.claude_key}',
+            'User-Agent': 'Apifox/1.0.0 (https://apifox.com)',
+            'Content-Type': 'application/json'
+        }
+
+        response = requests.post(url, headers=headers, data=payload)
+        content = response.json()["content"][0]["text"]
+
+        # response = self.call_llm(system_message, other_msg, additional_args)
+        # content = response.content[0].text
         
         if gen_mode == "completion":
             other_msg = other_msg[:-1] # remove initial assistant prompt
