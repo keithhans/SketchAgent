@@ -23,7 +23,7 @@ def call_argparse():
     parser.add_argument('--concept_to_draw', type=str, default="cat")
     parser.add_argument('--seed_mode', type=str, default='deterministic', choices=['deterministic', 'stochastic'])
     parser.add_argument('--path2save', type=str, default=f"results/test")
-    parser.add_argument('--model', type=str, default='claude-3-5-sonnet-20241022')
+    parser.add_argument('--model', type=str, default='claude-3-5-sonnet-20240620')
     parser.add_argument('--gen_mode', type=str, default='generation', choices=['generation', 'completion'])
 
     # Grid params
@@ -106,7 +106,7 @@ class SketchApp:
         if self.cache:
             content[-1]["cache_control"] = {"type": "ephemeral"}
 
-        other_msg = other_msg + [{"role": "user", "content": content}]
+        other_msg = other_msg + [{"role": "user", "content": msg}]
         return other_msg
         
 
@@ -157,8 +157,9 @@ class SketchApp:
             ] + other_msg,
             **additional_args  # Unpack additional arguments into the body dictionary
         }
-        
         payload = json.dumps(body)
+        print(payload)
+
         Baseurl = "https://api.claude-Plus.top"
         url = Baseurl + "/v1/chat/completions"
         headers = {
@@ -169,7 +170,8 @@ class SketchApp:
         }
 
         response = requests.post(url, headers=headers, data=payload)
-        content = response.json()["content"][0]["text"]
+        print("\n", response)
+        content = response.json()["choices"][0]["message"]["content"]
 
         # response = self.call_llm(system_message, other_msg, additional_args)
         # content = response.content[0].text
